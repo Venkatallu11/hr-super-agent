@@ -29,7 +29,7 @@ that vision and targets Darwinbox's two known gaps as it expands into the US:
 
 - **US payroll/compliance depth** — rated a weak spot vs. Rippling. This server
   handles state income tax, minimum wage (state vs federal), FLSA overtime, and
-  I-9/E-Verify rules across 15 states.
+  I-9/E-Verify rules across **all 50 states + DC**.
 - **Fewer integrations** — the `notify_manager` tool is a real, configurable
   Slack/email connector, not a fake stub.
 
@@ -70,6 +70,18 @@ python test_server.py  # verify all 13 tools register and run
 
 `demo.py` prints a full agent conversation where every tool result is real.
 It's the quickest way to *show* the project working (great for a screenshot).
+
+### Or launch the web dashboard
+
+```bash
+python web_app.py    # then open http://localhost:8000
+```
+
+A clickable dashboard (Python standard library only — no extra dependencies)
+that exercises every tool: employee lookup, all-50-state compliance, the
+overtime calculator, attrition risk, pay equity, policy search, and approval
+workflows. Perfect for a live demo or a screen recording. See `DEMO.md` for a
+suggested recording script.
 
 ## Connect it to Claude Desktop (chat with your HR agent)
 
@@ -117,7 +129,8 @@ export SMTP_PASSWORD="your-app-password"
 | File | Purpose |
 |------|---------|
 | `server.py` | The MCP server and its 13 tools |
-| `compliance_data.py` | US federal + 15-state payroll/compliance rules |
+| `compliance_data.py` | US federal + all-50-states + DC payroll/compliance rules |
+| `web_app.py` | Interactive web dashboard (stdlib only, no dependencies) |
 | `analytics.py` | Explainable attrition risk + pay-equity analysis |
 | `policy_qa.py` | Semantic policy search (TF-IDF + cosine, no ML libs) |
 | `workflows.py` | Multi-level approval workflow engine |
@@ -128,7 +141,8 @@ export SMTP_PASSWORD="your-app-password"
 
 ## Roadmap
 
-- [ ] Expand from 15 states to all 50 + local (city/county) rules
+- [x] Expand to all 50 states + DC
+- [ ] Add local (city/county) payroll rules
 - [ ] Replace sample data with a real database (Darwinbox uses MongoDB)
 - [ ] Add authentication / per-employee permissions
 - [ ] Add a short demo video
