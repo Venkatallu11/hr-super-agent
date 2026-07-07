@@ -45,6 +45,18 @@ that vision and targets Darwinbox's two known gaps as it expands into the US:
 | `get_i9_everify_requirements` | Federal I-9 + state E-Verify rules |
 | `notify_manager` | Notify a manager via **real** Slack/email (or simulated) |
 
+### Advanced capabilities — hard problems, made simple
+
+These are the features enterprise HR suites sell as premium, black-box modules.
+Here they're transparent, dependency-free, and easy to read:
+
+| Tool | What it does | The "hard problem" it tackles |
+|------|--------------|-------------------------------|
+| `predict_attrition_risk` | 0-100 flight-risk score with a full explanation of every factor | **Explainable** workforce analytics (no black box) |
+| `analyze_pay_equity` | Flags below-median pay and gender pay gaps within a role | Pay-equity compliance (a hot US legal topic) |
+| `ask_hr_policy` | Answers natural-language policy questions | **Semantic search** (real TF-IDF + cosine, pure Python) |
+| `submit_approval_request` / `act_on_approval` / `get_approval_status` | Routes requests through multi-level approval chains | Workflow automation (a $6k expense auto-routes Manager→Finance→HR/VP) |
+
 ## See it in action (no setup, no API key)
 
 ```bash
@@ -53,7 +65,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 
 python demo.py         # watch an AI agent use the tools on real scenarios
-python test_server.py  # verify all 7 tools register and run
+python test_server.py  # verify all 13 tools register and run
 ```
 
 `demo.py` prints a full agent conversation where every tool result is real.
@@ -93,7 +105,8 @@ export SMTP_PASSWORD="your-app-password"
 
 ## What's real vs. sample
 
-- The **MCP server, all 7 tools, the overtime/wage math, and the Slack/email
+- The **MCP server, all 13 tools, the analytics/semantic-search/workflow logic,
+  the overtime/wage math, and the Slack/email
   integration are 100% real** — the same protocol Darwinbox uses.
 - The **employee records are sample data** so it runs anywhere with zero setup.
 - The **compliance rules are simplified/illustrative** (see `compliance_data.py`);
@@ -103,8 +116,11 @@ export SMTP_PASSWORD="your-app-password"
 
 | File | Purpose |
 |------|---------|
-| `server.py` | The MCP server and its 7 tools |
+| `server.py` | The MCP server and its 13 tools |
 | `compliance_data.py` | US federal + 15-state payroll/compliance rules |
+| `analytics.py` | Explainable attrition risk + pay-equity analysis |
+| `policy_qa.py` | Semantic policy search (TF-IDF + cosine, no ML libs) |
+| `workflows.py` | Multi-level approval workflow engine |
 | `integrations.py` | Real Slack/email connector with safe fallback |
 | `sample_data.py` | Sample employees + onboarding checklist |
 | `demo.py` | Scripted agent walkthrough (real tool calls) |

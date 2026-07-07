@@ -24,6 +24,10 @@ async def main():
     await call("calculate_overtime_pay", {"hours_worked": 46, "hourly_rate": 20})
     await call("get_i9_everify_requirements", {"state": "AZ"})
     await call("notify_manager", {"employee_id": "E1002", "message": "Please approve John's leave request."})
+    await call("predict_attrition_risk", {"employee_id": "E1005"})
+    await call("analyze_pay_equity", {"role": "Senior Software Engineer"})
+    await call("ask_hr_policy", {"question": "can I work remotely?"})
+    await call("submit_approval_request", {"workflow_type": "leave_request", "requester": "Wei Chen", "amount": 0})
 
 
 asyncio.run(main())
