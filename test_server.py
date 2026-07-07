@@ -19,7 +19,10 @@ async def main():
 
     await call("get_leave_balance", {"employee_id": "E1002"})
     await call("get_onboarding_checklist", {"employee_id": "E1002"})
-    await call("check_state_tax_compliance", {"employee_id": "E1002", "new_state": "TX"})
+    await call("check_state_tax_compliance", {"employee_id": "E1002", "state": "TX"})
+    await call("check_minimum_wage", {"state": "WA"})
+    await call("calculate_overtime_pay", {"hours_worked": 46, "hourly_rate": 20})
+    await call("get_i9_everify_requirements", {"state": "AZ"})
     await call("notify_manager", {"employee_id": "E1002", "message": "Please approve John's leave request."})
 
 
