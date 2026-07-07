@@ -1,0 +1,310 @@
+<title>HR Super Agent — Live Demo</title>
+<style>
+  :root {
+    --bg: #0d1424;
+    --bg-2: #121b30;
+    --card: #16203a;
+    --line: #253253;
+    --ink: #eaeefc;
+    --ink-soft: #b7c0e0;
+    --muted: #7d88ad;
+    --accent: #7c8cff;
+    --accent-soft: #2b3566;
+    --good: #46c98a;
+    --warn: #efb454;
+    --bad: #f2647a;
+    --term-bg: #0a1120;
+    --shadow: 0 18px 40px -24px rgba(0,0,0,.8);
+  }
+  :root[data-theme="light"], :root:not([data-theme="dark"]) {
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #eef1fa;
+      --bg-2: #e6eaf6;
+      --card: #ffffff;
+      --line: #dbe1f2;
+      --ink: #141a30;
+      --ink-soft: #3a4468;
+      --muted: #6b769b;
+      --accent: #4a5bef;
+      --accent-soft: #dfe3ff;
+      --good: #1f9d63;
+      --warn: #b9821f;
+      --bad: #d63e5c;
+      --term-bg: #0e1730;
+      --shadow: 0 16px 36px -26px rgba(30,40,90,.5);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0d1424; --bg-2: #121b30; --card: #16203a; --line: #253253;
+    --ink: #eaeefc; --ink-soft: #b7c0e0; --muted: #7d88ad; --accent: #7c8cff;
+    --accent-soft: #2b3566; --good: #46c98a; --warn: #efb454; --bad: #f2647a;
+    --term-bg: #0a1120; --shadow: 0 18px 40px -24px rgba(0,0,0,.8);
+  }
+  :root[data-theme="light"] {
+    --bg: #eef1fa; --bg-2: #e6eaf6; --card: #ffffff; --line: #dbe1f2;
+    --ink: #141a30; --ink-soft: #3a4468; --muted: #6b769b; --accent: #4a5bef;
+    --accent-soft: #dfe3ff; --good: #1f9d63; --warn: #b9821f; --bad: #d63e5c;
+    --term-bg: #0e1730; --shadow: 0 16px 36px -26px rgba(30,40,90,.5);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background:
+      radial-gradient(1100px 500px at 85% -10%, var(--accent-soft) 0%, transparent 55%),
+      var(--bg);
+    color: var(--ink);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: ui-monospace, "SF Mono", "SFMono-Regular", Menlo, Consolas, monospace; }
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 22px; }
+
+  /* Hero */
+  header.hero { padding: 68px 0 34px; }
+  .eyebrow {
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12px; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--accent); margin: 0 0 16px;
+    display: inline-flex; align-items: center; gap: 9px;
+  }
+  .eyebrow::before { content: ""; width: 26px; height: 1px; background: var(--accent); display: inline-block; }
+  h1 {
+    font-size: clamp(30px, 5.4vw, 52px); line-height: 1.04; margin: 0 0 18px;
+    letter-spacing: -.02em; text-wrap: balance; font-weight: 760;
+  }
+  h1 .grad { color: var(--accent); }
+  .lede { font-size: clamp(16px, 2.1vw, 19px); color: var(--ink-soft); max-width: 60ch; margin: 0 0 30px; }
+
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; max-width: 720px; }
+  @media (max-width: 620px) { .stats { grid-template-columns: repeat(2,1fr); } }
+  .stat {
+    background: var(--card); border: 1px solid var(--line); border-radius: 13px; padding: 16px 16px;
+  }
+  .stat .n { font-family: ui-monospace, Menlo, monospace; font-size: 26px; font-weight: 680;
+             color: var(--ink); font-variant-numeric: tabular-nums; letter-spacing: -.02em; }
+  .stat .l { font-size: 12px; color: var(--muted); margin-top: 3px; letter-spacing: .02em; }
+
+  /* Gap band */
+  .gap-band {
+    margin: 30px 0 8px; padding: 16px 18px; border-radius: 13px;
+    background: var(--bg-2); border: 1px solid var(--line);
+    display: flex; gap: 14px; align-items: flex-start; font-size: 14.5px; color: var(--ink-soft);
+  }
+  .gap-band b { color: var(--ink); }
+  .gap-band .tag { flex: none; font-family: ui-monospace, Menlo, monospace; font-size: 11px;
+    letter-spacing: .1em; text-transform: uppercase; color: var(--accent);
+    border: 1px solid var(--accent); border-radius: 999px; padding: 4px 10px; margin-top: 2px; }
+
+  /* Sections */
+  section { padding: 34px 0 6px; }
+  .sec-head { display: flex; align-items: baseline; gap: 12px; margin: 0 0 16px; }
+  .sec-head h2 { font-size: 15px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted);
+    margin: 0; font-weight: 640; }
+  .sec-head .rule { flex: 1; height: 1px; background: var(--line); }
+
+  .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+  @media (max-width: 760px) { .grid { grid-template-columns: 1fr; } }
+
+  .card {
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 18px 18px 16px; box-shadow: var(--shadow); display: flex; flex-direction: column;
+    transition: transform .18s ease, border-color .18s ease;
+  }
+  @media (prefers-reduced-motion: reduce) { .card { transition: none; } }
+  .card:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .card h3 { margin: 0 0 4px; font-size: 17px; letter-spacing: -.01em; }
+  .card .prob { font-size: 12.5px; color: var(--muted); margin: 0 0 14px; }
+  .controls { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+
+  button, select {
+    font: inherit; font-size: 13.5px; border-radius: 9px; border: 1px solid var(--line);
+    background: var(--bg-2); color: var(--ink); padding: 8px 13px; cursor: pointer;
+    transition: background .15s ease, border-color .15s ease;
+  }
+  button.primary { background: var(--accent); color: #0a0e1c; border-color: var(--accent); font-weight: 620; }
+  :root[data-theme="light"] button.primary { color: #fff; }
+  @media (prefers-color-scheme: light) { button.primary { color: #fff; } }
+  button:hover { border-color: var(--accent); }
+  button.primary:hover { filter: brightness(1.07); }
+  button:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  .term {
+    background: var(--term-bg); border: 1px solid var(--line); border-radius: 11px;
+    padding: 13px 14px; margin-top: auto; min-height: 68px;
+    font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    font-size: 12.5px; line-height: 1.62; color: #d6def5; white-space: pre-wrap;
+    word-break: break-word; overflow-x: auto;
+  }
+  .term .dim { color: #6b779e; }
+  .term.reveal { animation: fade .28s ease; }
+  @keyframes fade { from { opacity: .25; } to { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) { .term.reveal { animation: none; } }
+
+  .pill { display: inline-block; font-family: ui-monospace, Menlo, monospace; font-size: 11px;
+    padding: 2px 8px; border-radius: 999px; font-weight: 600; letter-spacing: .03em; }
+  .pill.high { color: var(--bad); border: 1px solid var(--bad); }
+  .pill.ok { color: var(--good); border: 1px solid var(--good); }
+
+  footer { padding: 44px 0 60px; margin-top: 30px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13.5px; }
+  footer .row { display: flex; flex-wrap: wrap; gap: 18px 26px; align-items: center; justify-content: space-between; }
+  footer a { color: var(--accent); text-decoration: none; font-weight: 560; }
+  footer a:hover { text-decoration: underline; }
+  .note { margin-top: 16px; font-size: 12.5px; color: var(--muted); max-width: 70ch; }
+  .built { font-family: ui-monospace, Menlo, monospace; font-size: 11.5px; color: var(--muted); }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">MCP server · HR automation</p>
+    <h1>HR tools that any <span class="grad">AI agent</span> can pick up and use.</h1>
+    <p class="lede">A Model Context Protocol server that plugs US compliance, workforce
+      analytics, semantic policy search, and approval workflows into an AI assistant —
+      the same protocol Darwinbox's Super Agent runs on. Everything below is a live,
+      real result from the tools. Click around.</p>
+    <div class="stats">
+      <div class="stat"><div class="n">13</div><div class="l">AI-callable tools</div></div>
+      <div class="stat"><div class="n">51</div><div class="l">states + DC covered</div></div>
+      <div class="stat"><div class="n">4</div><div class="l">hard problems solved</div></div>
+      <div class="stat"><div class="n">0</div><div class="l">runtime dependencies</div></div>
+    </div>
+    <div class="gap-band">
+      <span class="tag">Why</span>
+      <div>Darwinbox is scaling fast in the US and shipped the first MCP server in HCM.
+        Reviewers flag <b>US payroll depth</b> and <b>integrations</b> as its gaps vs. Rippling —
+        so this demo leans hardest exactly there.</div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <div class="sec-head"><h2>US Compliance</h2><span class="rule"></span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>State payroll rules</h3>
+        <p class="prob">The hard problem · payroll varies by all 50 states + DC</p>
+        <div class="controls">
+          <button class="primary" data-out="o_wage" data-key="minwage_DC">Min wage · DC</button>
+          <button data-out="o_wage" data-key="minwage_TX">Min wage · TX</button>
+          <button data-out="o_wage" data-key="statetax_move">Relocation CA → TX</button>
+        </div>
+        <div class="term" id="o_wage"><span class="dim">Pick a check above…</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Overtime &amp; hiring eligibility</h3>
+        <p class="prob">The hard problem · FLSA overtime math + I-9/E-Verify by state</p>
+        <div class="controls">
+          <button class="primary" data-out="o_ot" data-key="overtime">Calculate OT · 46h @ $20</button>
+          <button data-out="o_ot" data-key="i9_MS">I-9 / E-Verify · MS</button>
+        </div>
+        <div class="term" id="o_ot"><span class="dim">Pick a check above…</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Workforce Analytics</h2><span class="rule"></span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Attrition risk <span class="pill high">explainable</span></h3>
+        <p class="prob">The hard problem · flight-risk scoring without a black box</p>
+        <div class="controls">
+          <button class="primary" data-out="o_att" data-key="attrition_E1005">Score · Diego (Sales)</button>
+          <button data-out="o_att" data-key="attrition_E1002">Score · John (Eng)</button>
+        </div>
+        <div class="term" id="o_att"><span class="dim">Run the model above…</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Pay-equity analysis</h3>
+        <p class="prob">The hard problem · surface pay gaps &amp; gender disparity</p>
+        <div class="controls">
+          <button class="primary" data-out="o_pay" data-key="pay_equity_sse">Analyze · Senior Engineers</button>
+        </div>
+        <div class="term" id="o_pay"><span class="dim">Run the analysis above…</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-head"><h2>Semantic Search &amp; Workflow</h2><span class="rule"></span></div>
+    <div class="grid">
+
+      <div class="card">
+        <h3>Ask HR policy</h3>
+        <p class="prob">The hard problem · semantic search (TF-IDF + cosine, no ML libs)</p>
+        <div class="controls">
+          <button class="primary" data-out="o_pol" data-key="policy_carryover">"Do vacation days carry over?"</button>
+          <button data-out="o_pol" data-key="policy_remote">"Can I work remotely?"</button>
+          <button data-out="o_pol" data-key="policy_parental">"Parental leave?"</button>
+        </div>
+        <div class="term" id="o_pol"><span class="dim">Ask a question above…</span></div>
+      </div>
+
+      <div class="card">
+        <h3>Approval workflow</h3>
+        <p class="prob">The hard problem · a $6k expense auto-routes Manager → Finance → HR/VP</p>
+        <div class="controls">
+          <button class="primary" id="wf_next">Advance approval →</button>
+          <button id="wf_reset">Reset</button>
+        </div>
+        <div class="term" id="o_wf"><span class="dim">Press "Advance approval" to step through…</span></div>
+      </div>
+
+    </div>
+  </section>
+
+  <footer>
+    <div class="row">
+      <div>Built by <b>Venkat Allu</b> · an MCP server for HR automation</div>
+      <a href="https://github.com/Venkatallu11/hr-super-agent" target="_blank" rel="noopener">github.com/Venkatallu11/hr-super-agent →</a>
+    </div>
+    <p class="note">Honest footnote: this is a portfolio demo built from public research, using
+      illustrative sample data and simplified compliance rules. It's designed so a real
+      employee database and a maintained legal data source drop straight in. Every output
+      shown here is a genuine result produced by the tools.</p>
+    <p class="built">python · mcp · tf-idf semantic search · flsa overtime engine · stdlib web dashboard</p>
+  </footer>
+
+</main>
+
+<script>
+  const DATA = {"attrition_E1005": "Attrition risk for Diego Torres (E1005): 77/100 \u2014 HIGH\nWhy:\n  - Low engagement score (1/5) (+35)\n  - Almost no leave taken (2 days) \u2014 burnout signal (+20)\n  - No raise in 14 months (+12)\n  - Short tenure (14 months) \u2014 early-attrition window (+10)", "attrition_E1002": "Attrition risk for John Miller (E1002): 80/100 \u2014 HIGH\nWhy:\n  - Low engagement score (2/5) (+35)\n  - No raise in 22 months (+25)\n  - Almost no leave taken (3 days) \u2014 burnout signal (+20)", "pay_equity_sse": "Role: Senior Software Engineer (2 employees, median $148,500)\n  Below-median flags:\n    \u2022 None \u2014 pay looks equitable.\n  Gender pay gap: median pay for men is 12% higher in this role.", "policy_carryover": "[Policy: Paid Time Off] (match confidence 0.246)\nFull-time employees accrue 1.5 paid leave days per month, up to a maximum of 18 days per year. Unused leave over 5 days does not carry into the next year. Leave requests should be submitted at least two weeks in advance.", "policy_remote": "[Policy: Remote Work] (match confidence 0.233)\nEmployees may work remotely up to three days per week with manager approval. Fully remote arrangements require director sign-off and a home-office stipend of $500 is provided for eligible remote employees.", "policy_parental": "[Policy: Parental Leave] (match confidence 0.216)\nNew parents are eligible for 12 weeks of paid parental leave following the birth or adoption of a child. Leave must be taken within the first 12 months and can be split into two blocks.", "minwage_DC": "State: DC\nState minimum wage: $17.50/hr\nFederal minimum wage: $7.25/hr\nEffective minimum wage: $17.50/hr (state rate applies)\nNotes: Highest minimum wage in the country; indexed annually.", "minwage_TX": "State: TX\nState minimum wage: $7.25/hr\nFederal minimum wage: $7.25/hr\nEffective minimum wage: $7.25/hr (federal rate applies)\nNotes: No state income tax. Follows federal minimum wage.", "statetax_move": "State: TX\nState income tax: NO\nState withholding form: none (no state income tax)\nNotes: No state income tax. Follows federal minimum wage.\n\u26a0 Relocation detected: John Miller is moving from CA to TX. Update payroll withholding and have them complete the new state's withholding form.", "overtime": "Hours worked: 46 (regular 40, overtime 6)\nBase rate: $20.00/hr\nRegular pay: $800.00\nOvertime pay (x1.5 over 40h): $180.00\nTOTAL gross pay: $980.00", "i9_MS": "Federal requirement: EVERY US new hire must complete Form I-9 (employment eligibility verification) within 3 business days of their start date.\nState (MS): E-Verify is MANDATORY. E-Verify mandatory for all employers.", "workflow": ["Request REQ-0001 (expense_report) by John Miller \u2014 $6,000\nStatus: PENDING (step 1 of 3)\nApproval chain: Manager -> Finance -> HR/VP\nWaiting on: Manager\nHistory:\n  (no actions yet)", "Request REQ-0001 (expense_report) by John Miller \u2014 $6,000\nStatus: PENDING (step 2 of 3)\nApproval chain: Manager -> Finance -> HR/VP\nWaiting on: Finance\nHistory:\n  - Manager (Sara Lopez (Manager)) approved", "Request REQ-0001 (expense_report) by John Miller \u2014 $6,000\nStatus: PENDING (step 3 of 3)\nApproval chain: Manager -> Finance -> HR/VP\nWaiting on: HR/VP\nHistory:\n  - Manager (Sara Lopez (Manager)) approved\n  - Finance (Finance team) approved", "Request REQ-0001 (expense_report) by John Miller \u2014 $6,000\nStatus: APPROVED (complete)\nApproval chain: Manager -> Finance -> HR/VP\nHistory:\n  - Manager (Sara Lopez (Manager)) approved\n  - Finance (Finance team) approved\n  - HR/VP (HR/VP) approved"]};
+
+  function paint(el, text) {
+    el.textContent = text;
+    el.classList.remove("reveal"); void el.offsetWidth; el.classList.add("reveal");
+  }
+
+  document.querySelectorAll("button[data-key]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const out = document.getElementById(btn.dataset.out);
+      paint(out, DATA[btn.dataset.key] || "(no data)");
+    });
+  });
+
+  // Workflow stepper
+  const wf = DATA.workflow || [];
+  let wfi = -1;
+  const wfOut = document.getElementById("o_wf");
+  document.getElementById("wf_next").addEventListener("click", () => {
+    if (wfi < wf.length - 1) wfi++;
+    paint(wfOut, wf[wfi]);
+  });
+  document.getElementById("wf_reset").addEventListener("click", () => {
+    wfi = -1;
+    wfOut.innerHTML = '<span class="dim">Press "Advance approval" to step through…</span>';
+  });
+</script>
