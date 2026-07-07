@@ -18,6 +18,10 @@ from mcp.server.fastmcp import FastMCP
 from sample_data import EMPLOYEES, ONBOARDING_CHECKLIST
 from compliance_data import FEDERAL_RULES, STATE_RULES, SUPPORTED_STATES
 from integrations import deliver
+from analytics import predict_attrition_risk as _attrition
+from analytics import analyze_pay_equity as _pay_equity
+from policy_qa import search_policy as _search_policy
+import workflows
 
 # Create the server. The name shows up in the AI client's tool list.
 mcp = FastMCP("HR Super Agent")
@@ -208,6 +212,130 @@ def notify_manager(employee_id: str, message: str) -> str:
         subject=f"HR update for {employee['name']}",
     )
     return f"{status}\nRecipient: {employee['manager']} ({employee['manager_slack']})"
+
+
+# ===========================================================================
+# ADVANCED ANALYTICS TOOLS  (the "hard" stuff, made simple & explainable)
+# ===========================================================================
+@mcp.tool()
+def predict_attrition_risk(employee_id: str) -> str:
+    """Predict how likely an employee is to leave, with an explanation.
+
+    Returns a 0-100 risk score, a LOW/MEDIUM/HIGH level, and the exact factors
+    that drove it (no black box — every point is explained).
+
+    Args:
+        employee_id: The employee's ID, e.g. "E1002".
+    """
+    r = _attrition(employee_id)
+    if "error" in r:
+        return r["error"]
+    factors = "\n".join(f"  - {f}" for f in r["top_factors"])
+    return (
+        f"Attrition risk for {r['employee']} ({r['employee_id']}): "
+        f"{r['risk_score']}/100 — {r['risk_level']}\n"
+        f"Why:\n{factors}"
+    )
+
+
+@mcp.tool()
+def analyze_pay_equity(role: str = "") -> str:
+    """Analyze pay fairness within a role (or all roles), including gender gap.
+
+    Args:
+        role: Optional role name, e.g. "Senior Software Engineer". Blank = all roles.
+    """
+    r = _pay_equity(role)
+    if "error" in r:
+        return r["error"]
+    out = []
+    for a in r["analysis"]:
+        flags = "\n".join(f"    • {f}" for f in a["below_median_flags"])
+        out.append(
+            f"Role: {a['role']} ({a['employees']} employees, "
+            f"median ${a['median_salary_usd']:,})\n"
+            f"  Below-median flags:\n{flags}\n"
+            f"  {a['gender_gap']}"
+        )
+    return "\n\n".join(out) if out else "Not enough data to compare pay within a role."
+
+
+# ===========================================================================
+# HR POLICY Q&A TOOL  (semantic search over policy documents)
+# ===========================================================================
+@mcp.tool()
+def ask_hr_policy(question: str) -> str:
+    """Answer a natural-language HR policy question using semantic search.
+
+    Args:
+        question: e.g. "How many vacation days do I accrue?" or "Can I work remotely?"
+    """
+    r = _search_policy(question)
+    if "matched_policy" not in r:
+        return r["answer"]
+    return (
+        f"[Policy: {r['matched_policy']}] (match confidence {r['confidence']})\n"
+        f"{r['answer']}"
+    )
+
+
+# ===========================================================================
+# APPROVAL WORKFLOW TOOLS  (multi-level approval chains)
+# ===========================================================================
+@mcp.tool()
+def submit_approval_request(workflow_type: str, requester: str,
+                            amount: float = 0.0, description: str = "") -> str:
+    """Start a multi-level approval request (e.g. leave or expense).
+
+    The approval chain is built automatically from the amount — e.g. a big
+    expense routes through Manager -> Finance -> HR/VP.
+
+    Args:
+        workflow_type: "leave_request" or "expense_report".
+        requester: Name of the person submitting.
+        amount: Dollar amount (used to decide how many approval levels apply).
+        description: What the request is for.
+    """
+    r = workflows.submit_request(workflow_type, requester, amount, description)
+    return _format_request(r)
+
+
+@mcp.tool()
+def act_on_approval(request_id: str, decision: str, approver: str = "") -> str:
+    """Approve or reject the current step of an approval request.
+
+    Args:
+        request_id: e.g. "REQ-0001".
+        decision: "approve" or "reject".
+        approver: Name of the approver (for the audit trail).
+    """
+    r = workflows.act_on_request(request_id, decision, approver)
+    return _format_request(r)
+
+
+@mcp.tool()
+def get_approval_status(request_id: str) -> str:
+    """Check the status and history of an approval request.
+
+    Args:
+        request_id: e.g. "REQ-0001".
+    """
+    r = workflows.get_request_status(request_id)
+    return _format_request(r)
+
+
+def _format_request(r: dict) -> str:
+    if "error" in r:
+        return r["error"]
+    chain = " -> ".join(r["approval_chain"]) or "(none)"
+    history = "\n".join(f"  - {h}" for h in r["history"]) or "  (no actions yet)"
+    waiting = f"\nWaiting on: {r['waiting_on']}" if r["waiting_on"] else ""
+    return (
+        f"Request {r['id']} ({r['type']}) by {r['requester']} — ${r['amount']:,.0f}\n"
+        f"Status: {r['status']} ({r['progress']})\n"
+        f"Approval chain: {chain}{waiting}\n"
+        f"History:\n{history}"
+    )
 
 
 if __name__ == "__main__":
